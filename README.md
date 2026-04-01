@@ -1,161 +1,174 @@
-# Janito CLI
+# Janito
 
-A powerful command-line tool for running LLM-powered workflows with built-in tool execution capabilities.
+Janito is a command-line interface (CLI) tool for managing and interacting with Large Language Model (LLM) providers. It enables you to configure API keys, select providers and models, and submit prompts to various LLMs from your terminal. Janito is designed for extensibility, supporting multiple providers and a wide range of tools for automation and productivity.
 
-## Quick Start
+## Features
 
-### Installation
+- 🔑 Manage API keys and provider configurations
+- 🤖 Interact with multiple LLM providers (OpenAI, Google, Mistral, DashScope, and more)
+- 🛠️ List and use a variety of registered tools
+- 📝 Submit prompts and receive responses directly from the CLI
+- 📋 List available models for each provider
+- 🧩 Extensible architecture for adding new providers and tools
+- 🎛️ Rich terminal output and event logging
+
+### Advanced and Architectural Features
+
+- ⚡ **Event-driven architecture**: Modular, decoupled system using a custom EventBus for extensibility and integration.
+- 🧑‍💻 **Tool registry & dynamic tool execution**: Register new tools easily, execute them by name or call from automation pipelines.
+- 🤖 **LLM Agent automation**: Supports agent-like workflows with the ability to chain tools or make decisions during LLM conversations.
+- 🏗️ **Extensible provider management**: Add, configure, or switch between LLM providers and their models on the fly.
+- 🧰 **Rich tool ecosystem**: Includes file operations, local/remote script and command execution, text processing, and internet access (fetching URLs), all reusable by LLM or user.
+- 📝 **Comprehensive event & history reporting**: Detailed logs of prompts, events, tool usage, and responses for traceability and audit.
+- 🖥️ **Enhanced terminal UI**: Colorful, informative real-time outputs and logs to improve productivity and insight during LLM usage.
+
+## Installation
+
+Janito is a Python package. Install it using pip:
 
 ```bash
-uv pip install janito
+pip install janito
 ```
 
-### First-Time Setup
+## Usage
 
-1. **Get your API key**: Sign up at [Moonshot AI](https://platform.moonshot.cn/) and get your API key
-2. **Set your API key**:
-   ```bash
-   janito -p moonshot --set-api-key YOUR_MOONSHOT_API_KEY 
-   ```
+After installation, use the `janito` command in your terminal.
 
-### Basic Usage
+### Basic Commands
 
-**Moonshot (Recommended - Default Provider)**
-```bash
-# Using the default provider
-janito "Create a Python script that reads a CSV file"
+- **Set API Key for a Provider**
+  ```bash
+  janito --set-api-key API_KEY [-p PROVIDER]
+  ```
 
-# Using a specific Moonshot model
-janito -m kimi-k2-thinking "Explain quantum computing"
-```
+- **Set the Default Provider**
+  ```bash
+  janito --set default_provider=provider_name
+  ```
 
-**Other Providers**
-```bash
-# OpenAI
-janito -p openai -m gpt-4 "Write a React component"
+- **List Supported Providers**
+  ```bash
+  janito --list-providers
+  ```
 
-# Anthropic
-janito -p anthropic -m claude-sonnet-4-5-20250929 "Analyze this code"
+- **List Registered Tools**
+  ```bash
+  janito --list-tools
+  ```
 
-# Google
-janito -p google -m gemini-2.0-flash-exp "Generate unit tests"
-```
+- **List Models for a Provider**
+  ```bash
+  janito --provider PROVIDER --list-models
+  ```
 
-### Interactive Chat Mode
+- **Submit a Prompt**
+  ```bash
+  janito What is the capital of France?
+  ```
 
-By default, running `janito` without any arguments starts an interactive chat session:
-```bash
-janito
-```
+- **Start Interactive Chat Shell**
+  ```bash
+  janito
+  ```
 
-In chat mode, you can:
+### Advanced Options
 
-- Have multi-turn conversations
-- Execute code and commands
+- **Set a System Prompt**
+  ```bash
+  janito -s path/to/system_prompt.txt "Your prompt here"
+  ```
 
-- **One-shot mode**: Pass a prompt directly for single tasks:
-```bash
-janito "Create a Python script that reads a CSV file"
-```
+- **Select Model and Provider Temporarily**
+  ```bash
+  janito -p openai -m gpt-3.5-turbo "Your prompt here"
+  ```
 
-### Available Commands
+- **Set Provider-Specific Config**
+  ```bash
+  janito --set-config PROVIDER KEY VALUE
+  ```
 
-- `janito --list-providers` - List all supported providers
-- `janito --list-models` - List all available models
-- `janito --list-tools` - List all available tools
-- `janito --show-config` - Show current configuration
+- **Enable Event Logging**
+  ```bash
+  janito -e "Your prompt here"
+  ```
 
-### Configuration
+## 🌟 CLI Options Reference
 
-Set default provider and model:
-```bash
-janito --set provider=moonshot
-janito --set model=kimi-k2-thinking
-```
+### Core CLI Options
+| Option                  | Description                                                                 |
+|------------------------|-----------------------------------------------------------------------------|
+| `--version`            | Show program version                                                        |
+| `--list-tools`         | List all registered tools                                                   |
+| `--list-providers`     | List all supported LLM providers                                            |
+| `-l`, `--list-models`  | List models for current/selected provider                                   |
+| `--set-api-key`        | Set API key for the current or selected provider (`API_KEY`). Use `-p PROVIDER` to set for a specific provider. |
+| `--set provider=name` | Set the current LLM provider (e.g., janito --set provider=name)                                                |
+| `--set PROVIDER.model=MODEL` or `--set model=MODEL` | Set the default model for the current/selected provider, or globally. |
+| `-s`, `--system`       | Set a system prompt                                                         |
+| `-r`, `--role`         | Set the role for the agent (overrides config)                                |
+| `-p`, `--provider`     | Select LLM provider (overrides config)                                      |
+| `-m`, `--model`        | Select model for the provider                                               |
+| `-v`, `--verbose`      | Print extra information before answering                                    |
+| `-R`, `--raw`          | Print raw JSON response from API                                            |
+| `-e`, `--event-log`    | Log events to console as they occur                                         |
+| `[user_prompt]...`     | Prompt to submit (if no other command is used)                              |
 
-## Providers
+### 🧩 Extended Chat Mode Commands
+Once inside the interactive chat mode, you can use these slash commands:
 
-### Moonshot (Recommended)
+#### 📲 Basic Interaction
+| Command           | Description                                  |
+|-------------------|----------------------------------------------|
+| `/exit` or `exit` | Exit chat mode                               |
+| `/help`           | Show available commands                      |
+| `/multi`          | Activate multiline input mode                |
+| `/clear`          | Clear the terminal screen                    |
+| `/history`        | Show input history                           |
+| `/view`           | Print current conversation history           |
+| `/track`          | Show tool usage history                      |
 
-- **Models**: kimi-k2-turbo-preview, kimi-k2-thinking, kimi-k2-0905-preview
-- **Strengths**: Excellent Chinese/English support, competitive pricing, fast responses
-- **Setup**: Get API key from [Moonshot AI Platform](https://platform.moonshot.ai/)
+#### 💬 Conversation Management
+| Command             | Description                                  |
+|---------------------|----------------------------------------------|
+| `/restart` or `/start` | Start a new conversation (reset context)   |
+| `/prompt`           | Show the current system prompt               |
+| `/role <description>` | Change the system role                     |
+| `/lang [code]`      | Change interface language (e.g., `/lang en`) |
 
-### OpenAI
+#### 🛠️ Tool & Provider Interaction
+| Command              | Description                                  |
+|----------------------|----------------------------------------------|
+| `/tools`             | List available tools                         |
+| `/termweb-status`    | Show status of termweb server                |
+| `/termweb-logs`      | Show last lines of termweb logs              |
+| `/livelogs`          | Show live updates from server log file       |
+| `/edit <filename>`   | Open file in browser-based editor            |
 
-- **Models**: gpt-5, gpt-4.1, gpt-4o, gpt-4-turbo, gpt-3.5-turbo
-- **Setup**: Get API key from [OpenAI Platform](https://platform.openai.com/)
+#### 📊 Output Control
+| Command             | Description                                  |
+|---------------------|----------------------------------------------|
+| `/verbose`          | Show current verbose mode status             |
+| `/verbose [on|off]` | Set verbose mode                             |
 
-### Anthropic
+## Extending Janito
 
-- **Models**: claude-3-7-sonnet-20250219, claude-3-5-sonnet-20241022, claude-3-opus-20250514
-- **Setup**: Get API key from [Anthropic Console](https://console.anthropic.com/)
+Janito is built to be extensible. You can add new LLM providers or tools by implementing new modules in the `janito/providers` or `janito/tools` directories, respectively. See the source code and developer documentation for more details.
 
-### IBM WatsonX
+## Supported Providers
 
-- **Models**: ibm/granite-3-8b-instruct, ibm/granite-3-2b-instruct, meta-llama/llama-3-1-8b-instruct, meta-llama/llama-3-1-70b-instruct, mistralai/mistral-large
-- **Strengths**: Enterprise-grade AI, IBM Granite models, hosted Llama and Mistral models
-- **Setup**: Get API key and project ID from [IBM Cloud](https://cloud.ibm.com/)
+- OpenAI
+- Google Gemini
+- Mistral
+- DashScope
+- (And more via plugins)
 
-### Google
+## Contributing
 
-- **Models**: gemini-2.5-flash, gemini-2.5-pro, gemini-2.5-flash-lite-preview-06-17
-- **Setup**: Get API key from [Google AI Studio](https://makersuite.google.com/)
+Contributions are welcome! Please see the `CONTRIBUTING.md` (if available) or open an issue to get started.
 
-## Advanced Features
+## License
 
-### Tool Usage
+This project is licensed under the terms of the MIT license.
 
-Janito includes powerful built-in tools for:
-
-- File operations (read, write, search)
-- Code execution
-- Web scraping
-- System commands
-- And more...
-
-### Profiles
-Use predefined system prompts:
-```bash
-janito --developer "Create a REST API"  # Same as --profile developer
-janito --market "Analyze market trends"   # Same as --profile market-analyst
-```
-
-### Environment Variables
-
-> **Note**: API keys are set via `janito --set-api-key YOUR_KEY -p PROVIDER` and stored in `~/.janito/auth.json`. Provider-specific API key environment variables are not supported.
-
-The following environment variables are supported:
-
-| Variable | Description |
-|----------|-------------|
-| `BASE_URL` | Custom API base URL (overrides provider default) |
-| `BASE_API_KEY` | Custom API key (overrides provider-specific API key) |
-
-## Examples
-
-### Code Generation
-```bash
-janito "Create a Python FastAPI application with user authentication"
-```
-
-### File Analysis
-```bash
-janito "Analyze the performance bottlenecks in my_app.py"
-```
-
-### Data Processing
-```bash
-janito "Process this CSV file and generate summary statistics"
-```
-
-### Web Development
-```bash
-janito "Create a responsive landing page with Tailwind CSS"
-```
-
-## Support
-
-- **Full Documentation**: https://ikignosis.org/janito/
-- **Issues**: Report bugs and feature requests on GitHub
-- **Discord**: Join our community for help and discussions
+For more information, see the documentation in the `docs/` directory or run `janito --help`.
