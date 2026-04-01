@@ -1,3 +1,9 @@
+> **⚠️ WARNING**
+> 
+> This version is now deprecated
+> Follow https://github.com/ikignosis/janito for the latest version
+
+
 # Janito
 
 Janito is a command-line interface (CLI) tool for managing and interacting with Large Language Model (LLM) providers. It enables you to configure API keys, select providers and models, and submit prompts to various LLMs from your terminal. Janito is designed for extensibility, supporting multiple providers and a wide range of tools for automation and productivity.
